@@ -1,0 +1,24 @@
+{"timestamp":"2026-09-16T20:24:46.306013Z","level":"info","event":"::group::Pre Execute","logger":"task","filename":"task_runner.py","lineno":2412}
+{"timestamp":"2026-09-16T20:24:46.311581Z","level":"info","event":"DAG bundles loaded: dags-folder, example_dags, apache-airflow-providers-common-sql-example-dags, apache-airflow-providers-standard-example-dags","task_id":"extract","try_number":1,"dag_id":"day09_pipeline","map_index":-1,"run_id":"manual__2026-09-16T20:24:45.421227+00:00","ti_id":"01a0abe4-ac79-7cce-9383-519a45a2c1a0","logger":"airflow.dag_processing.bundles.manager.DagBundlesManager","filename":"manager.py","lineno":304}
+{"timestamp":"2026-09-16T20:24:46.311958Z","level":"info","event":"Filling up the DagBag from /opt/airflow/dags/day09_pipeline.py","task_id":"extract","try_number":1,"dag_id":"day09_pipeline","map_index":-1,"run_id":"manual__2026-09-16T20:24:45.421227+00:00","ti_id":"01a0abe4-ac79-7cce-9383-519a45a2c1a0","logger":"airflow.dag_processing.dagbag.BundleDagBag","filename":"dagbag.py","lineno":460}
+{"timestamp":"2026-09-16T20:24:46.364864Z","level":"info","event":"Worker startup parse complete","bundle_name":"dags-folder","bundle_version":null,"dag_file":"day09_pipeline.py","dag_id":"day09_pipeline","bundle_prepare_ms":0,"dag_file_parse_ms":52,"task_id":"extract","try_number":1,"map_index":-1,"run_id":"manual__2026-09-16T20:24:45.421227+00:00","ti_id":"01a0abe4-ac79-7cce-9383-519a45a2c1a0","logger":"task","filename":"task_runner.py","lineno":1073}
+{"timestamp":"2026-09-16T20:24:46.375517Z","level":"info","event":"Task instance is in running state","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.375585Z","level":"info","event":" Previous state of the Task instance: TaskInstanceState.QUEUED","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.375638Z","level":"info","event":"Current task name:extract","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.375663Z","level":"info","event":"Dag name:day09_pipeline","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.375711Z","level":"info","event":"::endgroup::","task_id":"extract","try_number":1,"dag_id":"day09_pipeline","map_index":-1,"run_id":"manual__2026-09-16T20:24:45.421227+00:00","ti_id":"01a0abe4-ac79-7cce-9383-519a45a2c1a0","logger":"task","filename":"task_runner.py","lineno":2232}
+{"timestamp":"2026-09-16T20:24:46.377309Z","level":"info","event":"order_id,customer,country,amount","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.377435Z","level":"info","event":"101,Ali,DE,120","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.377511Z","level":"info","event":"102,Anna,DE,80","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.377580Z","level":"info","event":"103,John,US,200","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.377643Z","level":"info","event":"104,Ali,DE,50","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.377711Z","level":"info","event":"105,Maria,DE,","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.377779Z","level":"info","event":"106,John,US,100","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.377837Z","level":"info","event":"107,Ali,DE,120","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.377894Z","level":"info","event":"108,,DE,90","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.377325Z","level":"info","event":"Done. Returned value was: None","task_id":"extract","try_number":1,"dag_id":"day09_pipeline","map_index":-1,"run_id":"manual__2026-09-16T20:24:45.421227+00:00","ti_id":"01a0abe4-ac79-7cce-9383-519a45a2c1a0","logger":"airflow.task.operators.airflow.providers.standard.operators.python.PythonOperator","filename":"python.py","lineno":233}
+{"timestamp":"2026-09-16T20:24:46.377443Z","level":"info","event":"::group::Post Execute","task_id":"extract","try_number":1,"dag_id":"day09_pipeline","map_index":-1,"run_id":"manual__2026-09-16T20:24:45.421227+00:00","ti_id":"01a0abe4-ac79-7cce-9383-519a45a2c1a0","logger":"task","filename":"task_runner.py","lineno":1580}
+{"timestamp":"2026-09-16T20:24:46.387227Z","level":"info","event":"Task instance in success state","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.387299Z","level":"info","event":" Previous state of the Task instance: TaskInstanceState.RUNNING","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.387392Z","level":"info","event":"Task operator:<Task(PythonOperator): extract>","logger":"task.stdout"}
+{"timestamp":"2026-09-16T20:24:46.387406Z","level":"info","event":"::endgroup::","task_id":"extract","try_number":1,"dag_id":"day09_pipeline","map_index":-1,"run_id":"manual__2026-09-16T20:24:45.421227+00:00","ti_id":"01a0abe4-ac79-7cce-9383-519a45a2c1a0","logger":"task","filename":"task_runner.py","lineno":2379}
