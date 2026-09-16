@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: segment_per_customer
+    columns:
+      - name: customer_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_name
+        data_tests:
+          - not_null
+
+      - name: segment
+        data_tests:
+          - not_null
