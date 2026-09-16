@@ -1,0 +1,9 @@
+order_id,customer,country,amount
+101,Ali,DE,120
+102,Anna,DE,80
+103,John,US,200
+104,Ali,DE,50
+105,Maria,DE,
+106,John,US,100
+107,Ali,DE,120
+108,,DE,90
