@@ -4,3 +4,4 @@ __pycache__/
 orders_clean.csv
 .env
 .env
+config/airflow.cfg
