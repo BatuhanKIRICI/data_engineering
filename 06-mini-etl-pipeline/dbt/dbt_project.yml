@@ -1,0 +1,10 @@
+name: "mini_etl"
+version: "1.0.0"
+
+profile: "dbt_project"
+
+model-paths: ["models"]
+
+models:
+  mini_etl:
+    +materialized: table
