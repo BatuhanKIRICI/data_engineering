@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 orders_clean.csv
 .env
+.env
