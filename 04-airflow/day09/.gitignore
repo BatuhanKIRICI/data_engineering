@@ -5,3 +5,6 @@ orders_clean.csv
 .env
 .env
 config/airflow.cfg
+dags/dbt/profiles.yml
+dags/dbt/target/
+dags/dbt/.user.yml

@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: customer_revenue
+    columns:
+      - name: customer
+        tests:
+          - not_null
+
+      - name: total_amount
+        tests:
+          - not_null
