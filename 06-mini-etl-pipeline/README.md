@@ -142,3 +142,59 @@ docker compose exec airflow-worker airflow dags list-runs mini_etl_pipeline
 - Getting a pipeline to run successfully and being able to debug it confidently are different skills.
 
 Debugging Airflow, Docker and networking issues is an area I will continue to develop through further hands-on projects.
+
+## Linux Debugging Basics
+
+While debugging this project's setup (missing `.venv`, wrong host address, missing `.env`), a small set of Linux commands turned out to be the standard way to isolate where a problem actually is — checking one layer at a time rather than guessing.
+
+### Process
+```bash
+ps aux | grep <process>
+kill <PID>
+```
+Find a running process and its PID; stop it if needed.
+
+### Resources
+```bash
+top
+```
+Live view of CPU/memory usage per process.
+
+### Services
+```bash
+systemctl --type=service --state=running
+sudo systemctl stop <service>
+```
+List running background services (e.g. database servers); stop one cleanly instead of killing its process directly.
+
+### Disk
+```bash
+df -h
+du -sh <directory>
+du -sh <directory>/*
+```
+`df` shows overall filesystem usage; `du` shows which directory is actually using the space.
+
+### Network
+```bash
+ss -ltn
+nc -zv localhost <port>
+```
+`ss` checks whether a service is listening on a port; `nc` checks whether that port is actually reachable.
+
+### Database connectivity
+```bash
+psql -h localhost -p 5432 -U <user> -d <database>
+```
+Confirms the connection works at the authentication/database level, not just the network level.
+
+### The debugging layers, in order
+```
+Is the process running?      -> ps
+Is it using CPU/memory?      -> top
+Is the service up?           -> systemctl
+Is there disk space?         -> df / du
+Is the port listening?       -> ss
+Is the port reachable?       -> nc
+Can I actually connect?      -> psql
+```
