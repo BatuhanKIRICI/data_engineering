@@ -10,6 +10,9 @@ This project is part of my Data Engineering learning journey. The goal of Day 9 
 - Docker / Docker Compose
 - PostgreSQL (host machine)
 - Python (PythonOperator)
+- dbt Core 1.12.5 (`dbt-postgres`)
+- RustFS (S3-compatible object storage)
+- Boto3
 
 ## What I Built
 
@@ -32,7 +35,7 @@ orders_clean.csv
 
 - **DAG**: `day09_pipeline`, `schedule="@daily"`, `retries=2`, `retry_delay=1 minute`
 - **Dependency**: `extract_task >> clean_task >> load_task`
-- 8 raw rows in → 6 valid rows out (1 dropped for a malformed column count, 1 dropped for a missing `customer` value)
+- 8 raw rows in -> 6 valid rows out (1 dropped for a malformed column count, 1 dropped for a missing `customer` value)
 - `load` uses `PostgresHook` with an Airflow Connection (`postgres_host`) rather than a hardcoded password in the DAG code
 
 ### Failure/retry test
@@ -44,8 +47,72 @@ load     -> upstream_failed (never ran)
 ```
 This confirmed that Airflow's dependency graph doesn't just define order — it prevents downstream tasks from running on top of a failed upstream step, rather than silently continuing with missing or bad data.
 
-### dbt integration — scope decision
-Chose *not* to run dbt from inside the Airflow container this round (would require installing dbt into the Airflow image or a separate execution environment — real complexity, low learning payoff for a first DAG). The conceptual role is clear instead: Airflow decides *when* things run and *in what order*; dbt decides *how* the SQL transformation itself is structured. In a fuller pipeline, a bash/dbt operator task would sit after `load`, calling `dbt run` against the already-loaded data.
+### Mini ETL integration — Object Storage + dbt
+
+After the initial Airflow pipeline, I extended the setup into a small end-to-end ETL pipeline using local S3-compatible object storage.
+
+The updated flow is:
+
+```text
+RustFS
+  |
+  | raw/orders.csv
+  v
+Airflow ingest
+  |
+  v
+PostgreSQL
+  |
+  v
+dbt run
+  |
+  v
+dbt test
+```
+
+The Airflow DAG is:
+
+```
+ingest
+  |
+  v
+dbt_run
+  |
+  v
+dbt_test
+```
+
+**Ingest**
+
+The `ingest` task:
+- reads `raw/orders.csv` from RustFS through the S3 API
+- uses Boto3 to access the object
+- applies the PostgreSQL watermark
+- loads new records into `mini_orders`
+- uses `ON CONFLICT (order_id) DO UPDATE` for idempotent writes
+- updates `mini_pipeline_state` after processing
+
+**dbt**
+
+The dbt task transforms the loaded PostgreSQL data:
+
+```
+mini_orders
+     |
+     v
+customer_revenue
+```
+
+The final `dbt_test` task validates the generated model.
+
+This creates a complete separation of responsibilities:
+- Airflow -> when, order, dependencies, failure handling
+- Python -> ingestion logic
+- PostgreSQL -> persistent storage and pipeline state
+- dbt -> SQL transformations and data tests
+- RustFS -> object storage
+
+This ingestion is designed to be idempotent: re-running the same source data does not create duplicate records because the load uses `ON CONFLICT (order_id) DO UPDATE`.
 
 ## The Debugging Journey (the real lesson of the day)
 
@@ -57,6 +124,28 @@ Getting the Airflow container to talk to PostgreSQL on the host turned into a mu
 4. **Wrong subnet (the actual bug)**: the first UFW rule allowed `172.17.0.0/16`, assumed from the `host.docker.internal` resolution — but `docker network inspect` showed the actual Compose network (`day09_default`) used `172.18.0.0/16`. The firewall rule was allowing traffic from a network the containers weren't even on.
 5. **pg_hba.conf**: after fixing the UFW subnet, the connection reached PostgreSQL but was rejected at the authentication layer — `pg_hba.conf` still had the old (wrong) `172.17.0.0/16` entry and needed updating to `172.18.0.0/16` to match.
 
+### Object Storage integration
+
+The second part introduced a new network path:
+
+```text
+Airflow worker
+      |
+      v
+RustFS (S3 API)
+      |
+      v
+raw/orders.csv
+```
+
+RustFS was connected to the Airflow Docker network so that the worker could reach it through:
+
+```
+http://rustfs:9000
+```
+
+The same ingestion code was first tested directly and then executed inside the Airflow worker. This verified that the pipeline was not only working from the host machine, but also from the actual Airflow task environment.
+
 ## What I Learned
 
 - Airflow's job is not to transform data — it's to decide when tasks run, in what order, and what happens on failure. The actual work (reading a file, cleaning rows, calling dbt) stays in plain Python/SQL/dbt; Airflow just orchestrates it.
@@ -66,3 +155,8 @@ Getting the Airflow container to talk to PostgreSQL on the host turned into a mu
 - A network/connection problem like this has independent layers (DNS resolution, firewall, service bind address, application-level auth) that can each fail separately. Testing them one at a time — hostname resolves? port reachable? firewall allows it? does the app-level auth accept it? — isolates the actual cause instead of changing multiple things and guessing which fix worked.
 - Airflow Connections (`postgres_host`, set up in the UI) keep credentials out of DAG code — the DAG references a connection ID, not a password.
 - dbt and Airflow solve different problems and compose together rather than overlap: dbt owns the SQL transformation logic and its dependency graph between *models*; Airflow owns the scheduling and dependency graph between *pipeline steps*, one of which can be "run dbt."
+- Object storage can act as the raw-data layer before relational transformation — in this case, RustFS stored the raw CSV while PostgreSQL stored the processed relational data.
+- An S3-compatible API allows Python code to interact with local object storage using the same general client model used for cloud object storage.
+- Incremental processing and idempotency solve different problems: the watermark decides what should be processed, while the UPSERT determines what happens if the same record is processed again.
+- The same pipeline should be tested both directly and from its real orchestration environment — code working on the host does not automatically mean it will work inside an Airflow worker container.
+- Removing a stray `ingest()` call from module-level code mattered: Airflow parses DAG files periodically regardless of whether a run is triggered, so any code that executes at import time (rather than only inside a task) runs silently and repeatedly in the background.
