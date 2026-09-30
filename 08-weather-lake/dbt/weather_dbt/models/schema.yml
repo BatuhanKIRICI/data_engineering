@@ -1,0 +1,13 @@
+models:
+  - name: stg_weather
+    columns:
+      - name: weather_date
+        data_tests:
+          - unique
+          - not_null
+
+      - name: weather
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["drizzle", "fog", "rain", "snow", "sun"]

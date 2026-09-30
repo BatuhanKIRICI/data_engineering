@@ -2,3 +2,8 @@
 data/
 __pycache__/
 .env
+
+config/airflow.cfg
+dbt/logs/
+dbt/weather_dbt/target/
+dbt/weather_dbt/logs/
