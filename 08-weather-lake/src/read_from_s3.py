@@ -2,41 +2,50 @@ import boto3
 import pandas as pd
 from io import BytesIO
 from sqlalchemy import create_engine
+from sqlalchemy import text
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
 
-s3 = boto3.client(
-    "s3",
-    endpoint_url="http://localhost:9000",
-)
+def ingest():
+    load_dotenv()
 
-response = s3.get_object(
-    Bucket="weather-lake",
-    Key="raw/seattle-weather.csv",
-)
+    s3 = boto3.client(
+        "s3",
+        endpoint_url="http://rustfs:9000",
+        region_name=os.getenv("AWS_DEFAULT_REGION"),
+    )
 
-data = response["Body"].read()
+    response = s3.get_object(
+        Bucket="weather-lake",
+        Key="raw/seattle-weather.csv",
+    )
 
-df = pd.read_csv(BytesIO(data))
+    data = response["Body"].read()
 
-print(df.head())
-print(df.shape)
+    df = pd.read_csv(BytesIO(data))
 
-engine = create_engine(
-    f"postgresql+psycopg2://{os.getenv('POSTGRES_USER')}:"
-    f"{os.getenv('POSTGRES_PASSWORD')}@"
-    f"{os.getenv('POSTGRES_HOST')}:"
-    f"{os.getenv('POSTGRES_PORT')}/"
-    f"{os.getenv('POSTGRES_DB')}"
-)
+    print(df.head())
+    print(df.shape)
 
-df.to_sql(
-    "weather_data",
-    engine,
-    if_exists="replace",
-    index=False,
-)
+    engine = create_engine(
+        f"postgresql+psycopg2://{os.getenv('POSTGRES_USER')}:"
+        f"{os.getenv('POSTGRES_PASSWORD')}@"
+        f"{os.getenv('POSTGRES_HOST')}:"
+        f"{os.getenv('POSTGRES_PORT')}/"
+        f"{os.getenv('POSTGRES_DB')}"
+    )
+
+    with engine.connect() as conn:
+        conn.execute(text("TRUNCATE TABLE weather_data"))
+        conn.commit()
+
+    df.to_sql(
+        "weather_data",
+        engine,
+        if_exists="append",
+        index=False,
+    )
+
 
 print("Loaded to PostgreSQL.")

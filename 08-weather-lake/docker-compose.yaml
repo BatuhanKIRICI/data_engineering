@@ -79,6 +79,9 @@ x-airflow-common: &airflow-common
     - ${AIRFLOW_PROJ_DIR:-.}/airflow/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/airflow/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/dbt/weather_dbt/.container/profiles.yml:/home/airflow/.dbt/profiles.yml:ro
+    - ${AIRFLOW_PROJ_DIR:-.}/src:/opt/airflow/src
+    - ${AIRFLOW_PROJ_DIR:-.}/dbt:/opt/airflow/dbt
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on: &airflow-common-depends-on
     redis:
@@ -174,6 +177,8 @@ services:
 
   airflow-worker:
     <<: *airflow-common
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: celery worker
     healthcheck:
       # yamllint disable rule:line-length
