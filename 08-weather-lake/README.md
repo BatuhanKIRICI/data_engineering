@@ -88,3 +88,24 @@ ingest -> dbt_run -> dbt_test   (SUCCESS)
 ## Scope
 
 Incremental loading / upsert logic was intentionally left out here (the table is fully reloaded each run via TRUNCATE + append) since that pattern was already built and tested in an earlier project. The focus of this project was the S3 -> PostgreSQL -> dbt -> Airflow integration itself, and the container networking required to make it work as an independent stack.
+
+## Cloud Day 2 — IAM & Least Privilege
+
+Implemented a RustFS IAM lab using the existing `weather-lake` bucket.
+
+- Installed and used the RustFS CLI (`rc`)
+- Created a dedicated `weather-reader` IAM user
+- Created a custom IAM policy with `s3:GetObject`
+- Restricted access to `weather-lake/raw/*`
+- Verified that the user can read `raw/seattle-weather.csv`
+- Verified that access to `processed/seattle-weather.csv` is denied with `403 AccessDenied`
+
+The policy intentionally does not include `s3:ListBucket`; object listing and object reading are separate permissions in S3-compatible storage.
+
+### IAM mental model
+
+```text
+WHO   -> weather-reader
+WHAT  -> s3:GetObject
+WHERE -> weather-lake/raw/*
+This demonstrates the least-privilege principle: a pipeline credential should receive only the permissions required for its intended data access.
