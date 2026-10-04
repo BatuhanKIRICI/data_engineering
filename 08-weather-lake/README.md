@@ -109,3 +109,27 @@ WHO   -> weather-reader
 WHAT  -> s3:GetObject
 WHERE -> weather-lake/raw/*
 This demonstrates the least-privilege principle: a pipeline credential should receive only the permissions required for its intended data access.
+
+## Cloud Day 3 — Presigned URLs (temporary access)
+
+Used the existing `weather-lake` bucket to practice sharing an object without sharing credentials.
+
+- Generated a presigned download URL for `raw/seattle-weather.csv` with `rc object share` (explicit expiry via `--expire`)
+- Downloaded the file with plain `curl` and no access key or secret key
+- Saw a `HEAD` request on the same URL fail with `403`: the signature is tied to the HTTP method the URL was generated for (a download URL signs `GET`, not `HEAD`)
+
+```text
+authorized user -> creates signed URL -> anyone holding the URL -> object (until it expires)
+```
+
+### Things worth remembering
+
+- A presigned URL acts like a key: whoever holds it can use it until it expires, so it should be short-lived and never committed or pasted into shared places.
+- It carries at most the permissions of the user who generated it.
+- When the storage server was stopped, `rc object share` reported `Object not found`, while `rc object list` on the same path showed the real cause (`Connection refused` on `localhost:9000`). The object was fine; the server was unavailable.
+
+### Not covered yet
+
+- Verifying the URL stops working after expiry
+- Generating a URL with the restricted `weather-reader` user for an object it is not allowed to read
+- Upload URLs (`--upload`)
