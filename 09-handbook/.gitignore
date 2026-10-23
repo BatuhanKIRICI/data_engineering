@@ -2,3 +2,8 @@
 data/
 __pycache__/
 .env
+
+!pyspark/data/
+pyspark/data/*
+!pyspark/data/orders.csv
+!pyspark/data/orders.jsonl
