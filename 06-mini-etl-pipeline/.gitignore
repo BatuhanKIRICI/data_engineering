@@ -7,3 +7,5 @@ dbt/logs/
 dbt/target/
 dbt/profiles.yml
 dbt/.user.yml
+
+data/orders_downloaded.csv
