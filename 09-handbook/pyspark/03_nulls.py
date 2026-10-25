@@ -1,3 +1,4 @@
+# Tested with pyspark 4.2.0, Java 17
 from pyspark.sql import SparkSession, functions as F
 
 spark = SparkSession.builder.appName("HandbookNulls").master("local[*]").getOrCreate()

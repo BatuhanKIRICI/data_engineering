@@ -1,3 +1,4 @@
+# Tested with pyspark 4.2.0, Java 17
 # ============================================================
 # PySpark 07: JSON Lines with an explicit schema (StructType) and bad records
 #

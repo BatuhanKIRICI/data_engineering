@@ -1,3 +1,4 @@
+# Tested with pyspark 4.2.0, Java 17
 from pathlib import Path
 from pyspark.sql import SparkSession
 

@@ -1,3 +1,4 @@
+# Tested with pyspark 4.2.0, Java 17
 # ============================================================
 # PySpark 08: lazy evaluation, transformations vs actions, explain()
 #

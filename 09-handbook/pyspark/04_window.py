@@ -1,3 +1,4 @@
+# Tested with pyspark 4.2.0, Java 17
 # ============================================================
 # PySpark 04: window functions (row_number, lag, lead)
 #

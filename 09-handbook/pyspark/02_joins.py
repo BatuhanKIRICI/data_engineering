@@ -1,3 +1,4 @@
+# Tested with pyspark 4.2.0, Java 17
 # ============================================================
 # PySpark 03: null values (isNull, fillna) and what they do to results
 #

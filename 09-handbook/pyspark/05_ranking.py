@@ -1,3 +1,4 @@
+# Tested with pyspark 4.2.0, Java 17
 # ============================================================
 # PySpark 05: row_number vs rank vs dense_rank (ties)
 #
